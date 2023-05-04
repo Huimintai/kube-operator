@@ -17,26 +17,56 @@ limitations under the License.
 package v1alpha1
 
 import (
+	api "github.com/Huimintai/kube-operator/pkg/util"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // ClusterSpec defines the desired state of Cluster
 type ClusterSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of Cluster. Edit cluster_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// HostsConfRef represent a configMap which actually store the hosts.yml in ansible
+	// +required
+	HostsConfRef *api.ConfigMapRef `json:"hostsConfRef"`
+	// VarsConfRef represent a configMap which actually store the group_vars.yml in ansible
+	// +required
+	VarsConfRef *api.ConfigMapRef `json:"varsConfRef"`
+	// KubeConfRef represent a configMap which actually store kubeconfig
+	// +optional
+	KubeConfRef *api.ConfigMapRef `json:"kubeConfRef"`
+	// SSHAuthRef store sshkey.If it is empty ansible will use ssh password
+	// +optional
+	SSHAuthRef *api.SecretRef `json:"SSHAuthRef"`
+	// +optional
+	PreCheckRef *api.ConfigMapRef `json:"preCheckRef"`
 }
 
 // ClusterStatus defines the observed state of Cluster
 type ClusterStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Conditions []ClusterCondition `json:"conditions"`
 }
+
+type ClusterCondition struct {
+	// ClusterOps refers to the name of ClusterOperation
+	// +required
+	ClusterOps string `json:"clusterOps"`
+	// +optional
+	Status ClusterConditionType `json:"clusterConditionType"`
+	// +optional
+	StartTime *metav1.Time `json:"startTime,omitempty"`
+	// +optional
+	EndTime *metav1.Time `json:"endTime,omitempty"`
+}
+
+type ClusterConditionType string
+
+const (
+	ClusterCreating ClusterConditionType = "Running"
+
+	ClusterRunning ClusterConditionType = "Succeeded"
+
+	ClusterUpdating ClusterConditionType = "Failed"
+
+	BlockedStatus ClusterConditionType = "Blocked"
+)
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
