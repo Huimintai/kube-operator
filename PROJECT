@@ -17,4 +17,13 @@ resources:
   kind: Cluster
   path: github.com/Huimintai/kube-operator/api/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: cogiot.io
+  group: kubean.io
+  kind: ClusterOperation
+  path: github.com/Huimintai/kube-operator/api/v1alpha1
+  version: v1alpha1
 version: "3"
